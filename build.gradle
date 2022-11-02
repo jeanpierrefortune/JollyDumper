@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.beryx.jlink' version '2.25.0'
+}
+
+group 'org.calypsonet'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    maven { url = "https://repo.eclipse.org/service/local/repositories/maven_central/content" }
+    mavenCentral()
+    maven { url = "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url = "https://s01.oss.sonatype.org/content/repositories/snapshots" }
+}
+
+ext {
+    junitVersion = '5.8.2'
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainModule = 'org.calypsonet.jollydumper'
+    mainClass = 'org.calypsonet.jollydumper.HelloApplication'
+}
+
+javafx {
+    version = '17.0.2'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
+}
+
+dependencies {
+    implementation('com.dlsc.formsfx:formsfx-core:11.5.0') {
+        exclude(group: 'org.openjfx')
+    }
+    implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
+    implementation('org.calypsonet.terminal:calypsonet-terminal-reader-java-api:1.1.0-SNAPSHOT')
+    implementation('org.calypsonet.terminal:calypsonet-terminal-calypso-java-api:1.4.0-SNAPSHOT')
+    implementation('org.eclipse.keyple:keyple-common-java-api:2.0.+')
+    implementation('org.eclipse.keyple:keyple-service-java-lib:2.1.1')
+    implementation('org.eclipse.keyple:keyple-service-resource-java-lib:2.0.2')
+    implementation('org.eclipse.keyple:keyple-plugin-pcsc-java-lib:2.1.0')
+    implementation('org.eclipse.keyple:keyple-card-calypso-java-lib:2.2.4-SNAPSHOT')
+    implementation('org.eclipse.keyple:keyple-util-java-lib:2.+')
+    implementation('org.slf4j:slf4j-simple:1.7.32')
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jlink {
+    imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'app'
+    }
+}
+
+jlinkZip {
+    group = 'distribution'
+}
